@@ -3,7 +3,7 @@ from typing import Counter
 file = open("input.txt")
 
 def step(state: Counter[int]) -> Counter[int]:
-    new_state = Counter()
+    new_state = Counter[int]()
     for rock, count in state.items():
         str_rock = str(rock)
         if rock == 0:
@@ -15,9 +15,9 @@ def step(state: Counter[int]) -> Counter[int]:
             new_state[rock * 2024] += count
     return new_state
 
-rocks = Counter()
+rocks = Counter[int]()
 for line in file:
-    rocks = Counter([int(i) for i in line.split()])
+    rocks = Counter[int]([int(i) for i in line.split()])
 
 for i in range(75):
     rocks = step(rocks)
