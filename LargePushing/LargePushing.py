@@ -58,14 +58,7 @@ for command in commands:
     if not legal:
         continue
 
-    if dir == '<':
-        hit_boxes.sort(key=lambda x:x[0])
-    elif dir == '>':
-        hit_boxes.sort(key=lambda x:x[0], reverse=True)
-    elif dir == '^':
-        hit_boxes.sort(key=lambda x:x[1])
-    elif dir == 'v':
-        hit_boxes.sort(key=lambda x:x[1], reverse=True)
+    hit_boxes.sort(key=lambda x:abs(x[0] - px) + abs(x[1] - py), reverse=True)
     for box in hit_boxes:
         boxes.remove(box)
         boxes.add((box[0] + dx, box[1] + dy))
