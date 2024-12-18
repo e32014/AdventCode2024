@@ -1,5 +1,6 @@
 file = open('input.txt')
 
+dirs = [(0,1), (1,0), (0, -1), (-1, 0)]
 
 def search(start, end, max_x, max_y, walls):
     queue = [(0, start, [start])]
@@ -25,14 +26,17 @@ for line in file:
     else:
         walls.add(tuple([int(i) for i in line.strip().split(",")]))
 
-dirs = [(0,1), (1,0), (0, -1), (-1, 0)]
 start = (0,0)
 end = (70,70)
 max_x = 70
 max_y = 70
-
+score, last_path = search(start, end, max_x, max_y, walls)
+print(score)
 for i in range(len(additionals)):
+    if additionals[i] not in last_path:
+        continue
     score, path = search(start, end, max_x, max_y, walls.union(set(additionals[:i+1])))
     if score == -1:
         print(additionals[i])
         break
+    last_path = path
