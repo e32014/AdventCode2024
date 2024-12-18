@@ -4,7 +4,6 @@ file = open('input.txt')
 
 registers = dict()
 
-
 def resolve_combo(combo_op):
     if combo_op < 4:
         return combo_op
@@ -15,21 +14,12 @@ def resolve_combo(combo_op):
     elif combo_op == 6:
         return registers['C']
 
-program = []
 
-for line in file:
-    if line.startswith("Register"):
-        char = line.split()[1][:-1]
-        val = int(line.split()[-1])
-        registers[char] = val
-    if line.startswith("Program"):
-        program = [int(val) for val in line.split()[-1].split(',')]
-best = 0
-for i in range(100_000_000):
-    if i % 100_000 == 0:
-        print(i)
+def execute_program(reg_a, program):
     out = []
-    registers['A'] = i * 8**10 + 0o3701236017
+    registers['A'] = reg_a
+    registers['B'] = 0
+    registers['C'] = 0
     pointer = 0
     while pointer < len(program):
         op_code = program[pointer]
@@ -38,7 +28,7 @@ for i in range(100_000_000):
         pointer += 1
         if op_code == 0:
             val = resolve_combo(val)
-            registers['A'] = floor(registers['A'] / float(2**val))
+            registers['A'] = floor(registers['A'] / float(2 ** val))
         elif op_code == 1:
             registers['B'] = registers['B'] ^ val
         elif op_code == 2:
@@ -50,20 +40,32 @@ for i in range(100_000_000):
             registers['B'] = registers['B'] ^ registers['C']
         elif op_code == 5:
             val = resolve_combo(val)
-            if val%8 != program[len(out)]:
-                break
-            out.append(str(val % 8))
-            if len(out) > best:
-                print(oct(i * 8**10 + 0o3701236017), out)
-                best = len(out)
-                print(program)
+            out.append(val % 8)
         elif op_code == 6:
             val = resolve_combo(val)
-            registers['B'] = floor(registers['A'] / float(2**val))
+            registers['B'] = floor(registers['A'] / float(2 ** val))
         elif op_code == 7:
             val = resolve_combo(val)
-            registers['C'] = floor(registers['A'] / float(2**val))
-    if len(out) == len(program):
-        print(",".join(out))
-        print(i * 8**10 + 0o3701236017)
-        break
+            registers['C'] = floor(registers['A'] / float(2 ** val))
+    return out
+
+def get_best(program, pos, curr):
+    for val in range(8):
+        if execute_program(curr * 8 + val, program) == program[pos:]:
+            if pos == 0:
+                return curr * 8 + val
+            step = get_best(program, pos - 1, curr * 8 + val)
+            if step is not None:
+                return step
+    return None
+program = []
+
+for line in file:
+    if line.startswith("Register"):
+        char = line.split()[1][:-1]
+        val = int(line.split()[-1])
+        registers[char] = val
+    if line.startswith("Program"):
+        program = [int(val) for val in line.split()[-1].split(',')]
+
+print(get_best(program, len(program) - 1, 0))
