@@ -34,30 +34,18 @@ while queue:
     for dx, dy in dirs:
         if 0 <= px + dx < len(grid[0]) and 0 <= py + dy < len(grid) and grid[py + dy][px + dx] != '#':
             queue.append(((px + dx, py + dy), curr, curr_path + [(px + dx, py + dy)]))
-
-for i, j in combinations(path, 2):
-    sx, sy = i
-    ex, ey = j
-    if 1 < abs(sx - ex) + abs(sy - ey) <= 20:
-        cheat_pairs.add((i, j))
-print(len(cheat_pairs))
-curr = end
-count = 0
-while prevs[curr] is not None:
-    count += 1
-    curr = prevs[curr]
-
-savings = Counter()
-for cheat_end, cheat_start in cheat_pairs:
-    cheat_count = -1  * (abs(cheat_end[0] - cheat_start[0]) + abs(cheat_end[1] - cheat_start[1])) + 1
-    cheat_curr = cheat_start
-    while prevs[cheat_curr] != cheat_end:
-        cheat_count += 1
-        cheat_curr = prevs[cheat_curr]
-    savings[cheat_count] += 1
-print(count)
+test_dict = Counter()
+for i in range(len(path) - 100):
+    for j in range(i + 100, len(path)):
+        sx, sy = path[i]
+        ex, ey = path[j]
+        if 1 < abs(sx - ex) + abs(sy - ey) <= 20:
+            cheat_pairs.add((path[i], path[j]))
+            score = j - i - (abs(sx - ex) + abs(sy -ey))
+            test_dict[score] += 1
 total = 0
-for val, num in sorted(savings.items()):
+for val, num in sorted(test_dict.items()):
     if val >= 100:
+        print(val, num)
         total += num
 print(total)
